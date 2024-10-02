@@ -17,7 +17,10 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.34")
 
     // runtime dependencies
-    //runtimeOnly("org.flywaydb:flyway-database-postgresql:10.18.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.18.2")
+
+    // processors
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
