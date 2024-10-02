@@ -11,7 +11,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = PRIVATE)
 public class ConnectionUtil {
 
-    private static final String datasourceUrl = "jdbc:postgresql://localhost/sample-jdbc";
+    private static final String datasourceUrl = "jdbc:postgresql://localhost:5432/sample-jdbc";
     private static final String datasourceUser = "postgres";
     private static final String datasourcePassword = "postgres";
 
