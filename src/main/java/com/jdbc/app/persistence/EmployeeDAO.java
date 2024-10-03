@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.ZoneOffset.UTC;
 
 public class EmployeeDAO {
 
@@ -42,7 +45,30 @@ public class EmployeeDAO {
     }
 
     public List<EmployeeEntity> findAll() {
-        return null;
+        List<EmployeeEntity> entityList = new ArrayList<>();
+
+        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
+
+            String sql = "SELECT * FROM employees";
+            statement.executeQuery(sql);
+
+
+            var resultSet = statement.getResultSet();
+            while (resultSet.next()) {
+                var employee = new EmployeeEntity();
+                employee.setId(resultSet.getLong("id"));
+                employee.setName(resultSet.getString("name"));
+                employee.setSalary(resultSet.getBigDecimal("salary"));
+                var birthdayInstant = resultSet.getTimestamp("birthday").toInstant();
+                employee.setBirthday(OffsetDateTime.ofInstant(birthdayInstant, UTC));
+
+                entityList.add(employee);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return entityList;
     }
 
     public EmployeeEntity findById(final long id) {
