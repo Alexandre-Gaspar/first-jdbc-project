@@ -72,7 +72,30 @@ public class EmployeeDAO {
     }
 
     public EmployeeEntity findById(final long id) {
-        return null;
+
+        var employee = new EmployeeEntity();
+
+        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
+
+            String sql = "SELECT * FROM employees WHERE id=" + id;
+            statement.executeQuery(sql);
+
+
+            var resultSet = statement.getResultSet();
+
+            if (resultSet.next()) {
+                employee.setId(resultSet.getLong("id"));
+                employee.setName(resultSet.getString("name"));
+                employee.setSalary(resultSet.getBigDecimal("salary"));
+                var birthdayInstant = resultSet.getTimestamp("birthday").toInstant();
+                employee.setBirthday(OffsetDateTime.ofInstant(birthdayInstant, UTC));
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return employee;
     }
 
     private String formatOffsetDateTime(final OffsetDateTime dateTime) {
