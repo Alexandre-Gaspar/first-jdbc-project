@@ -36,8 +36,28 @@ public class EmployeeDAO {
         }
     }
 
-    public void update(final EmployeeEntity entity) {
+    public void update(final EmployeeEntity employee) {
+        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
+            var birthday = formatOffsetDateTime(employee.getBirthday());
 
+            var sql = "UPDATE employees SET " +
+                    "name = '" + employee.getName() + "', " +
+                    "salary = " + employee.getSalary() + ", " +
+                    "birthday = '" + birthday + "' " +
+                    "WHERE id = " + employee.getId();
+
+            statement.executeUpdate(sql);
+
+            System.out.printf("Foram afectadas %s registros na base de dados", statement.getUpdateCount());
+//            try (ResultSet resultSet = statement.executeQuery(sql)) {
+//                if (!resultSet.next()) {
+//                    employee.setId(resultSet.getLong("id"));
+//                }
+//            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void delete(final Long id) {
