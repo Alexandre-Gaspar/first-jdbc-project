@@ -1,7 +1,11 @@
 package com.jdbc.app;
 
 import com.jdbc.app.persistence.EmployeeDAO;
+import com.jdbc.app.persistence.entity.EmployeeEntity;
 import org.flywaydb.core.Flyway;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 public class Main {
 
@@ -27,7 +31,15 @@ public class Main {
 
 //        employeeDAO.findAll().forEach(System.out::println);
 
-        System.out.println(employeeDAO.findById(2L));
+//        System.out.println(employeeDAO.findById(2L));
+
+        var employee = new EmployeeEntity();
+        employee.setId(2);
+        employee.setName("Madalena Samuel");
+        employee.setSalary(new BigDecimal("589.00"));
+        employee.setBirthday(OffsetDateTime.now().minusDays(9));
+
+        employeeDAO.update(employee);
 
     }
 }
