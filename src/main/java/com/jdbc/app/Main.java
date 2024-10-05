@@ -1,11 +1,7 @@
 package com.jdbc.app;
 
 import com.jdbc.app.persistence.EmployeeDAO;
-import com.jdbc.app.persistence.entity.EmployeeEntity;
 import org.flywaydb.core.Flyway;
-
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 
 public class Main {
 
@@ -23,9 +19,9 @@ public class Main {
         flyway.migrate();
 
 //        EmployeeEntity employee = new EmployeeEntity();
-//        employee.setName("Madalena Cassua");
-//        employee.setSalary(new BigDecimal("380"));
-//        employee.setBirthday(OffsetDateTime.now().minusYears(18).minusMonths(1).minusDays(7));
+//        employee.setName("Fé Mourinho");
+//        employee.setSalary(new BigDecimal("677.390"));
+//        employee.setBirthday(OffsetDateTime.now().minusYears(10).minusMonths(6).minusDays(6));
 //
 //        employeeDAO.insert(employee);
 
@@ -33,13 +29,15 @@ public class Main {
 
 //        System.out.println(employeeDAO.findById(2L));
 
-        var employee = new EmployeeEntity();
-        employee.setId(2);
-        employee.setName("Madalena Samuel");
-        employee.setSalary(new BigDecimal("589.00"));
-        employee.setBirthday(OffsetDateTime.now().minusDays(9));
+//        var employee = new EmployeeEntity();
+//        employee.setId(2);
+//        employee.setName("Madalena Samuel");
+//        employee.setSalary(new BigDecimal("589.00"));
+//        employee.setBirthday(OffsetDateTime.now().minusDays(9));
+//
+//        employeeDAO.update(employee);
 
-        employeeDAO.update(employee);
+        employeeDAO.delete(2L);
 
     }
 }

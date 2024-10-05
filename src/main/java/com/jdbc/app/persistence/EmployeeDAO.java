@@ -61,7 +61,14 @@ public class EmployeeDAO {
     }
 
     public void delete(final Long id) {
+        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
+            String sql = "DELETE FROM employees WHERE id = " + id;
+            statement.executeUpdate(sql);
 
+            System.out.printf("%s line(s) afected", statement.getUpdateCount());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public List<EmployeeEntity> findAll() {
