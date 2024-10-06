@@ -5,7 +5,6 @@ import com.jdbc.app.persistence.entity.EmployeeEntity;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,35 +29,29 @@ public class EmployeeDAO {
     }
 
     public void update(final EmployeeEntity employee) {
-        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
-            var birthday = formatOffsetDateTime(employee.getBirthday());
+        try (
+                var connection = ConnectionUtil.getConnection();
+                var statement = connection.prepareStatement("UPDATE employees SET name = ?, salary = ?, birthday = ? WHERE id = ?")
+        ) {
+            statement.setString(1, employee.getName());
+            statement.setBigDecimal(2, employee.getSalary());
+            statement.setTimestamp(3, Timestamp.valueOf(employee.getBirthday().atZoneSameInstant(UTC).toLocalDateTime()));
+            statement.setLong(4, employee.getId());
 
-            var sql = "UPDATE employees SET " +
-                    "name = '" + employee.getName() + "', " +
-                    "salary = " + employee.getSalary() + ", " +
-                    "birthday = '" + birthday + "' " +
-                    "WHERE id = " + employee.getId();
-
-            statement.executeUpdate(sql);
-
-            System.out.printf("Foram afectadas %s registros na base de dados", statement.getUpdateCount());
-//            try (ResultSet resultSet = statement.executeQuery(sql)) {
-//                if (!resultSet.next()) {
-//                    employee.setId(resultSet.getLong("id"));
-//                }
-//            }
-
+            statement.executeUpdate();
+            System.out.printf("%s line(s) affected", statement.getUpdateCount());
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
     public void delete(final Long id) {
-        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
-            String sql = "DELETE FROM employees WHERE id = " + id;
-            statement.executeUpdate(sql);
-
-            System.out.printf("%s line(s)  afected", statement.getUpdateCount());
+        try (
+                var connection = ConnectionUtil.getConnection();
+                var statement = connection.prepareStatement("DELETE FROM employees WHERE id = " + id)
+        ) {
+            statement.executeUpdate();
+            System.out.printf("%s line(s) affected", statement.getUpdateCount());
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -67,11 +60,11 @@ public class EmployeeDAO {
     public List<EmployeeEntity> findAll() {
         List<EmployeeEntity> entityList = new ArrayList<>();
 
-        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
-
-            String sql = "SELECT * FROM employees";
-            statement.executeQuery(sql);
-
+        try (
+                var connection = ConnectionUtil.getConnection();
+                var statement = connection.prepareStatement("SELECT * FROM employees")
+        ) {
+            statement.executeQuery();
 
             var resultSet = statement.getResultSet();
             while (resultSet.next()) {
@@ -95,12 +88,12 @@ public class EmployeeDAO {
 
         var employee = new EmployeeEntity();
 
-        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
+        try (
+                var connection = ConnectionUtil.getConnection();
+                var statement = connection.prepareStatement("SELECT * FROM employees WHERE id=" + id)
+        ) {
 
-            String sql = "SELECT * FROM employees WHERE id=" + id;
-            statement.executeQuery(sql);
-
-
+            statement.executeQuery();
             var resultSet = statement.getResultSet();
 
             if (resultSet.next()) {
@@ -117,9 +110,4 @@ public class EmployeeDAO {
 
         return employee;
     }
-
-    private String formatOffsetDateTime(final OffsetDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-
 }
