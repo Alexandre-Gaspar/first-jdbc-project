@@ -2,8 +2,8 @@ package com.jdbc.app.persistence;
 
 import com.jdbc.app.persistence.entity.EmployeeEntity;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,22 +14,15 @@ import static java.time.ZoneOffset.UTC;
 public class EmployeeDAO {
 
     public void insert(final EmployeeEntity employee) {
-        try (var connection = ConnectionUtil.getConnection(); var statement = connection.createStatement()) {
-            var name = employee.getName();
-            var salary = employee.getSalary().toString();
-            var birthday = formatOffsetDateTime(employee.getBirthday());
+        try (
+                var connection = ConnectionUtil.getConnection();
+                var statement = connection.prepareStatement("INSERT INTO employees (name, salary, birthday) VALUES (?, ?, ?);")
+        ) {
+            statement.setString(1, employee.getName());
+            statement.setBigDecimal(2, employee.getSalary());
+            statement.setTimestamp(3, Timestamp.valueOf(employee.getBirthday().atZoneSameInstant(UTC).toLocalDateTime()));
 
-            String sql = "INSERT INTO employees (name, salary, birthday) " + "VALUES " +
-                    "('" + name + "', " +
-                    "'" + salary + "', '" +
-                    birthday + "') " +
-                    "RETURNING id;"; // returns the last object persisted id
-
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
-                if (!resultSet.next()) {
-                    employee.setId(resultSet.getLong("id"));
-                }
-            }
+            statement.executeUpdate();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -65,7 +58,7 @@ public class EmployeeDAO {
             String sql = "DELETE FROM employees WHERE id = " + id;
             statement.executeUpdate(sql);
 
-            System.out.printf("%s line(s) afected", statement.getUpdateCount());
+            System.out.printf("%s line(s)  afected", statement.getUpdateCount());
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
